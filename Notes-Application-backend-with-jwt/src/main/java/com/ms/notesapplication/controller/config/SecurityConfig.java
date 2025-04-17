@@ -61,6 +61,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/home","/auth/signup","/auth/login","/auth/jwtlogin").permitAll()
                                 .requestMatchers("/api/admin/contact").denyAll()
                                 .requestMatchers("/api/notes/**").permitAll()
+                                .requestMatchers("/api/admincont/**").hasRole("ADMIN")
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/user/**").hasRole("USER")
                                 .requestMatchers("/api/mod/**").hasRole("MODERATOR")

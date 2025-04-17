@@ -1,9 +1,8 @@
 package com.ms.notesapplication.service;
 
-import com.ms.notesapplication.dto.LoginJwtResponse;
-import com.ms.notesapplication.dto.LoginRequest;
-import com.ms.notesapplication.dto.SignupRequest;
-import com.ms.notesapplication.dto.SignupResponse;
+import com.ms.notesapplication.dto.*;
+
+import java.util.List;
 
 public interface UserService {
 
@@ -12,4 +11,13 @@ public interface UserService {
       LoginJwtResponse userLogin(LoginRequest loginRequest);
 
       LoginJwtResponse userJwtLogin(LoginRequest loginRequest);
+
+      //Admin functions
+      UserDtoResponse updateUserRoleDetails(UserDtoRequest userDtoRequest);
+
+      List<UserDtoResponse> getAllUserDetails();
+
+      UserDtoResponse getUserById(Long id);
+
+
 }

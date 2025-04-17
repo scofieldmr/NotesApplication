@@ -1,12 +1,11 @@
 package com.ms.notesapplication.service;
 
-import com.ms.notesapplication.dto.LoginJwtResponse;
-import com.ms.notesapplication.dto.LoginRequest;
-import com.ms.notesapplication.dto.SignupRequest;
-import com.ms.notesapplication.dto.SignupResponse;
+import com.ms.notesapplication.Mapper.UserMapper;
+import com.ms.notesapplication.dto.*;
 import com.ms.notesapplication.entity.MyUser;
 import com.ms.notesapplication.entity.Roles;
 import com.ms.notesapplication.exception.RoleNotFoundException;
+import com.ms.notesapplication.exception.UserIdNotFoundException;
 import com.ms.notesapplication.exception.UsernameAlreadyExistsException;
 import com.ms.notesapplication.jwt.JwtUtils;
 import com.ms.notesapplication.repository.RoleRepository;
@@ -22,9 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.Role;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,5 +134,56 @@ public class UserServiceImp implements UserService {
 
         return loginJwtResponse;
 
+    }
+
+    @Override
+    public UserDtoResponse updateUserRoleDetails(UserDtoRequest userDtoRequest) {
+
+        MyUser user = userRepository.findById(userDtoRequest.getId())
+                .orElseThrow(()-> new UserIdNotFoundException("User not found with id " + userDtoRequest.getId()));
+
+        user.setUsername(userDtoRequest.getUsername());
+
+        Set<Roles> rolesSet = new HashSet<>();
+
+        for(String roleName : userDtoRequest.getRoles()) {
+            Roles role = roleRepository.findByRole(roleName);
+            if(role != null) {
+                rolesSet.add(role);
+            }
+            else {
+                throw new RoleNotFoundException("Role not found with name " + roleName);
+            }
+        }
+
+        user.setRoles(rolesSet);
+
+        MyUser updatedUser = userRepository.save(user);
+
+        return UserMapper.userToUserDtoResponse(updatedUser);
+    }
+
+    @Override
+    public List<UserDtoResponse> getAllUserDetails() {
+
+        List<MyUser> users = userRepository.findAll();
+
+        List<UserDtoResponse> userDtoResponseList = users.stream()
+                .map((u)-> UserMapper.userToUserDtoResponse(u)).collect(Collectors.toList());
+
+        return userDtoResponseList;
+    }
+
+    @Override
+    public UserDtoResponse getUserById(Long id) {
+
+        MyUser user = userRepository.findById(id)
+                .orElseThrow(()-> new UserIdNotFoundException("User not found with id " + id));
+
+        UserDtoResponse userDtoResponse = UserMapper.userToUserDtoResponse(user);
+
+        System.out.println(userDtoResponse.toString());
+
+        return userDtoResponse;
     }
 }
